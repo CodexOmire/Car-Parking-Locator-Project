@@ -70,9 +70,15 @@ header p {
 
 .parking-card {
   background: white;
-  padding: 15px;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  line-height: 1.6;
+  transition: transform 0.2s ease;
+}
+
+.parking-card:hover {
+  transform: translateY(-4px);
 }
 
 .parking-card h3 {
@@ -84,7 +90,7 @@ header p {
 
 .parking-card p {
   font-size: 14px;
-  margin-bottom: 5px;
+  margin: 6px 0;
 }
 
 .available {
@@ -101,11 +107,12 @@ header p {
   background: #16a34a;
   color: white;
   border: none;
-  padding: 8px;
+  padding: 10px;
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
   font-size: 14px;
+  margin-top: 10px;
 }
 
 .favorite-btn:hover {
