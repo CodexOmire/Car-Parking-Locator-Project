@@ -42,7 +42,8 @@ function showSpots(spots) {
 
 async function showFilteredSpots() {
   const spots = await getSpots();
-  const searchText = document.getElementById('search-input').value.toLowerCase();
+  const searchInput = document.getElementById('search-input');
+  const searchText = searchInput ? searchInput.value.toLowerCase() : '';
 
   const filteredSpots = spots.filter(spot => 
     spot.location.toLowerCase().includes(searchText)
