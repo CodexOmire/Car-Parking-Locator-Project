@@ -6,7 +6,7 @@ async function getSpots() {
     const spots = await response.json();
     return spots;
   } catch (error) {
-    console.error("Failed to fetch spots:", error);
+    console.log("Failed to fetch spots:", error);
     return [];
   }
 }
@@ -33,10 +33,42 @@ function showSpots(spots) {
         Available: ${spot.availability ? 'Yes' : 'No'}
       </p>
       <p>Price: $${spot.price.toFixed(2)}/hr</p>
-      <button class="favorite-btn" data-id="${spot.id}">Add Favorite</button>
+      <button class="favorite-btn" data-id="${spot.id}">
+        ${isFavorite(spot.id) ? 'Remove Favorite' : 'Add Favorite'}
+      </button>
     `;
 
     container.appendChild(card);
+  });
+
+  addFavoriteEvents();
+}
+
+function isFavorite(id) {
+  const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  return favorites.includes(id.toString());
+}
+
+function toggleFavorite(id) {
+  let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+  if (favorites.includes(id.toString())) {
+    favorites = favorites.filter(fav => fav !== id.toString());
+    alert('Removed from favorites!');
+  } else {
+    favorites.push(id.toString());
+    alert('Added to favorites!');
+  }
+  localStorage.setItem('favorites', JSON.stringify(favorites));
+}
+
+function addFavoriteEvents() {
+  const buttons = document.querySelectorAll('.favorite-btn');
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      const id = button.getAttribute('data-id');
+      toggleFavorite(id);
+      button.textContent = isFavorite(id) ? 'Remove Favorite' : 'Add Favorite';
+    });
   });
 }
 
@@ -44,30 +76,34 @@ async function showFilteredSpots() {
   const spots = await getSpots();
   const searchInput = document.getElementById('search-input');
   const searchText = searchInput ? searchInput.value.toLowerCase() : '';
-  const filterType = document.getElementById('type-filter').value;
+  const filterType = document.getElementById('type-filter')?.value || 'all';
+  const onlyFavorites = document.getElementById('only-favorites')?.checked;
 
-  let filteredSpots = spots.filter(spot => {
-    const matchesType = (filterType === 'all') || (spot.type === filterType);
-    const matchesText = spot.location.toLowerCase().includes(searchText);
-    return matchesType && matchesText;
-  });
+  let filteredSpots = spots.filter(spot =>
+    spot.location.toLowerCase().includes(searchText)
+  );
+
+  if (filterType !== 'all') {
+    filteredSpots = filteredSpots.filter(spot => spot.type === filterType);
+  }
+
+  if (onlyFavorites) {
+    const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
+    filteredSpots = filteredSpots.filter(spot =>
+      favs.includes(spot.id.toString())
+    );
+  }
 
   showSpots(filteredSpots);
 }
 
-// Wait for DOM before adding listeners
-window.addEventListener('DOMContentLoaded', async () => {
+// Load and display spots
+window.addEventListener('load', async () => {
   const spots = await getSpots();
   showSpots(spots);
-
-  // Add event listeners safely
-  const searchInput = document.getElementById('search-input');
-  const filterSelect = document.getElementById('type-filter');
-
-  if (searchInput) {
-    searchInput.addEventListener('input', showFilteredSpots);
-  }
-  if (filterSelect) {
-    filterSelect.addEventListener('change', showFilteredSpots);
-  }
 });
+
+// Filter functionality
+document.getElementById('search-input')?.addEventListener('input', showFilteredSpots);
+document.getElementById('type-filter')?.addEventListener('change', showFilteredSpots);
+document.getElementById('only-favorites')?.addEventListener('change', showFilteredSpots);

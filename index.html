@@ -1,33 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Car Parking Locator - LanoPark</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header>
     <h1>LanoPark Parking</h1>
     <p>Find a parking spot quickly and easily</p>
   </header>
+
   <main>
     <section class="toolbar">
-      <input type="text" id="search-input" placeholder="Search by location" aria-label="Search parking spots">
+      <input type="text" id="search-input" placeholder="Search by location" aria-label="Search parking spots" />
+      
       <select id="type-filter" aria-label="Filter by parking type">
         <option value="all">All Types</option>
         <option value="public">Public</option>
         <option value="private">Private</option>
         <option value="disabled">Disabled</option>
       </select>
+
+      <label for="only-favorites" class="favorites-filter">
+        <input type="checkbox" id="only-favorites" />
+        Show only favorites
+      </label>
     </section>
+
     <section id="parking-container">
       <p id="loading">Loading...</p>
     </section>
   </main>
+
   <footer>
     <p>© 2025 LanoPark. All rights reserved.</p>
   </footer>
+
   <script src="script.js"></script>
 </body>
 </html>
