@@ -6,7 +6,7 @@ async function getSpots() {
     const spots = await response.json();
     return spots;
   } catch (error) {
-    console.log("Failed to fetch spots:", error);
+    console.error("Failed to fetch spots:", error);
     return [];
   }
 }
@@ -14,7 +14,7 @@ async function getSpots() {
 function showSpots(spots) {
   const container = document.getElementById('parking-container');
   const loading = document.getElementById('loading');
-  loading.style.display = 'none';
+  if (loading) loading.style.display = 'none';
   container.innerHTML = '';
 
   if (spots.length === 0) {
@@ -44,17 +44,30 @@ async function showFilteredSpots() {
   const spots = await getSpots();
   const searchInput = document.getElementById('search-input');
   const searchText = searchInput ? searchInput.value.toLowerCase() : '';
+  const filterType = document.getElementById('type-filter').value;
 
-  const filteredSpots = spots.filter(spot => 
-    spot.location.toLowerCase().includes(searchText)
-  );
+  let filteredSpots = spots.filter(spot => {
+    const matchesType = (filterType === 'all') || (spot.type === filterType);
+    const matchesText = spot.location.toLowerCase().includes(searchText);
+    return matchesType && matchesText;
+  });
 
   showSpots(filteredSpots);
 }
 
-window.addEventListener('load', async () => {
+// Wait for DOM before adding listeners
+window.addEventListener('DOMContentLoaded', async () => {
   const spots = await getSpots();
   showSpots(spots);
-});
 
-document.getElementById('search-input').addEventListener('input', showFilteredSpots);
+  // Add event listeners safely
+  const searchInput = document.getElementById('search-input');
+  const filterSelect = document.getElementById('type-filter');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', showFilteredSpots);
+  }
+  if (filterSelect) {
+    filterSelect.addEventListener('change', showFilteredSpots);
+  }
+});
