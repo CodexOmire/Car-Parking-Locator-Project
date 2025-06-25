@@ -1,7 +1,5 @@
-// Confirms JavaScript is loaded
 console.log("App is ready!");
 
-// Fetches parking spots from server
 async function getSpots() {
   try {
     const response = await fetch('http://localhost:3000/parkingSpots');
@@ -13,19 +11,21 @@ async function getSpots() {
   }
 }
 
-// Displays parking spots as cards
 function showSpots(spots) {
   const container = document.getElementById('parking-container');
   const loading = document.getElementById('loading');
-  loading.style.display = 'none'; // Hides loading message
-  container.innerHTML = ''; // Clears previous content
+  loading.style.display = 'none';
+  container.innerHTML = '';
 
-  // Loops through spots to create cards
+  if (spots.length === 0) {
+    container.innerHTML = '<p style="text-align: center;">No spots found.</p>';
+    return;
+  }
+
   spots.forEach(spot => {
     const card = document.createElement('div');
     card.className = 'parking-card';
 
-    // Adds card content
     card.innerHTML = `
       <h3>${spot.location}</h3>
       <p>Type: ${spot.type[0].toUpperCase() + spot.type.slice(1)}</p>
@@ -40,8 +40,20 @@ function showSpots(spots) {
   });
 }
 
-// Loads spots on page load
+async function showFilteredSpots() {
+  const spots = await getSpots();
+  const searchText = document.getElementById('search-input').value.toLowerCase();
+
+  const filteredSpots = spots.filter(spot => 
+    spot.location.toLowerCase().includes(searchText)
+  );
+
+  showSpots(filteredSpots);
+}
+
 window.addEventListener('load', async () => {
   const spots = await getSpots();
   showSpots(spots);
 });
+
+document.getElementById('search-input').addEventListener('input', showFilteredSpots);
