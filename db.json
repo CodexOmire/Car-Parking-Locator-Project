@@ -34,9 +34,9 @@
     },
     {
       "id": 5,
-      "location": "Naivas",
+      "location": "Naivas Vanga",
       "type": "public",
-      "availability": true,
+      "availability": false,
       "price": 2.50,
       "image": "images/naivas.jpg"
     }

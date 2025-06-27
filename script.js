@@ -26,7 +26,10 @@ function showSpots(spots) {
     const card = document.createElement('div');
     card.className = 'parking-card';
 
+    const imagePath = spot.image.startsWith('http') ? spot.image : `${spot.image}`;
+
     card.innerHTML = `
+      <img src="${imagePath}" alt="${spot.location}" />
       <h3>${spot.location}</h3>
       <p>Type: ${spot.type[0].toUpperCase() + spot.type.slice(1)}</p>
       <p class="${spot.availability ? 'available' : 'unavailable'}">
@@ -36,12 +39,16 @@ function showSpots(spots) {
       <button class="favorite-btn" data-id="${spot.id}">
         ${isFavorite(spot.id) ? 'Remove Favorite' : 'Add Favorite'}
       </button>
+      <button class="reserve-btn" data-id="${spot.id}" ${!spot.availability ? 'disabled' : ''}>
+        ${spot.availability ? 'Reserve Spot' : 'Unavailable'}
+      </button>
     `;
 
     container.appendChild(card);
   });
 
   addFavoriteEvents();
+  addReserveEvents();
 }
 
 function isFavorite(id) {
@@ -70,6 +77,35 @@ function addFavoriteEvents() {
       button.textContent = isFavorite(id) ? 'Remove Favorite' : 'Add Favorite';
     });
   });
+}
+
+function addReserveEvents() {
+  const buttons = document.querySelectorAll('.reserve-btn');
+  buttons.forEach(button => {
+    button.addEventListener('click', async () => {
+      const id = button.getAttribute('data-id');
+      await reserveSpot(id);
+      const updatedSpots = await getSpots();
+      showSpots(updatedSpots);
+    });
+  });
+}
+
+async function reserveSpot(id) {
+  try {
+    const response = await fetch(`http://localhost:3000/parkingSpots/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ availability: false })
+    });
+    if (!response.ok) throw new Error('Failed to reserve');
+    alert('Spot reserved successfully!');
+  } catch (error) {
+    console.error('Error reserving spot:', error);
+    alert('Failed to reserve the spot.');
+  }
 }
 
 async function showFilteredSpots() {
